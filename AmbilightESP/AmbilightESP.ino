@@ -56,14 +56,14 @@ void Adalight () {
 
       effectbuf_position = 0; // reset the buffer position for DATA collection...
 
-          //if(Serial.available()) { // if there is serial available... process it... could be 1  could be 100....
-          if(serverClients[0].available()) {
+          if(Serial.available()) { // if there is serial available... process it... could be 1  could be 100....
+          //if(serverClients[0].available()) {
                
-            //for (int i = 0; i < Serial.available(); i++) {  // go through every character in serial buffer looking for prefix...
-            for (int i = 0; i < serverClients[0].available(); i++) {  // go through every character in serial buffer looking for prefix...
+            for (int i = 0; i < Serial.available(); i++) {  // go through every character in serial buffer looking for prefix...
+            //for (int i = 0; i < serverClients[0].available(); i++) {  // go through every character in serial buffer looking for prefix...
 
-              //if (Serial.read() == prefix[prefixcount]) { // if character is found... then look for next...
-              if (serverClients[0].read() == prefix[prefixcount]) { // if character is found... then look for next...
+              if (Serial.read() == prefix[prefixcount]) { // if character is found... then look for next...
+              //if (serverClients[0].read() == prefix[prefixcount]) { // if character is found... then look for next...
                   prefixcount++;
               } else prefixcount = 0;  //  otherwise reset....  ////
 
@@ -75,8 +75,8 @@ void Adalight () {
             } // end of if prefix == 3
             
             } // end of for loop going through serial....
-            //} else if (!Serial.available() && (ada_sent + 5000) < millis()) {
-            } else if (!serverClients[0].available() && (ada_sent + 5000) < millis()) {
+            } else if (!Serial.available() && (ada_sent + 5000) < millis()) {
+            //} else if (!serverClients[0].available() && (ada_sent + 5000) < millis()) {
                   //Serial.print("Ada\n"); // Send "Magic Word" string to host every 5 seconds... 
                   if(serverClients[0].connected()) serverClients[0].print("Ada\n"); // Send "Magic Word" string to host every 5 seconds... 
                   ada_sent = millis(); 
@@ -86,14 +86,15 @@ void Adalight () {
 
     case MODE_CHECKSUM:
 
-        //if (Serial.available() >= 3) {
-        if (serverClients[0].available() >= 3) {
-          hi  = serverClients[0].read();
-          lo  = serverClients[0].read();
-          chk = serverClients[0].read();
-          //hi  = Serial.read();
-          //lo  = Serial.read();
-          //chk = Serial.read();
+
+        //if (serverClients[0].available() >= 3) {
+          //hi  = serverClients[0].read();
+          //lo  = serverClients[0].read();
+          //chk = serverClients[0].read();
+         if (Serial.available() >= 3) {
+          hi  = Serial.read();
+          lo  = Serial.read();
+          chk = Serial.read();
           if(chk == (hi ^ lo ^ 0x55)) {
             state = MODE_DATA;
           } else {
@@ -107,10 +108,10 @@ void Adalight () {
 
     case MODE_DATA:
 
-        //while(Serial.available() && effectbuf_position < 3 * strip.PixelCount()) {   
-        while(serverClients[0].available() && effectbuf_position < 3 * strip.PixelCount()) {   
-          //pixelsPOINT[effectbuf_position++] = Serial.read(); 
-          pixelsPOINT[effectbuf_position++] = serverClients[0].read();
+        while(Serial.available() && effectbuf_position < 3 * strip.PixelCount()) {   
+        //while(serverClients[0].available() && effectbuf_position < 3 * strip.PixelCount()) {   
+          pixelsPOINT[effectbuf_position++] = Serial.read(); 
+          //pixelsPOINT[effectbuf_position++] = serverClients[0].read();
         }
 
       if(effectbuf_position >= 3*pixelCount) { // goto show when buffer has recieved enough data...
